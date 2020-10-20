@@ -1,0 +1,1 @@
+# nyxit-seo-wp-plugin
