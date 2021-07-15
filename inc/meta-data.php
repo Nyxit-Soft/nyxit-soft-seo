@@ -2,7 +2,7 @@
 
 defined( 'ABSPATH' ) ?: exit;
 
-class nyxitMetaData
+class nyxitSeoMetaData
 {
 	protected $settings;
 
@@ -18,7 +18,7 @@ class nyxitMetaData
 
     public function register_post_meta_box()
 	{
-		add_meta_box( 'nyxit-seo-metabox', 'SEO', [ $this, 'post_metabox_callback' ], [ 'post', 'page' ], 'normal' );
+		add_meta_box( 'nyxit-seo-metabox', 'SEO', [ $this, 'post_metabox_callback' ], [ 'post', 'page', 'product' ], 'normal' );
     }
 
     public function post_metabox_callback()
@@ -91,21 +91,6 @@ class nyxitMetaData
 		</table>
 		<?php
 	}
-	
-	protected function get_current_view_id()
-	{
-		if ( is_singular() )
-		{
-			global $post;
-			return $post->ID;
-		}
-		elseif ( is_home() )
-		{
-			return get_option( 'page_for_posts' );
-		}
-
-		return false;
-	}
     
     protected function add_post_meta_to_db( $post_id, $seo_meta )
 	{
@@ -127,7 +112,9 @@ class nyxitMetaData
 	
 	protected function get_meta( $meta_name, $post_id )
 	{
-		return get_post_meta( $post_id, '_nyxit_'.$meta_name , true );
+		$meta = get_post_meta( $post_id, '_nyxit_'.$meta_name , true );
+		
+		return empty( $meta ) ? null : $meta;
 	}
     
     public function save_post_meta( $post_id )
@@ -197,24 +184,26 @@ class nyxitMetaData
 
 	public function h1_shortcode( $atts )
 	{
-		global $post;
-
 		$atts = shortcode_atts( [
 			'id' => '',
 			'class' => '',
 		], $atts );
+		$post_id = nyxitSeoHelper::get_cur_view_id();
+		$h1_text = $this->get_meta( 'h1', $post_id );
 
 		$h1 = '<h1';
 		$h1 .= ! empty( $atts['id'] ) ? ' id="'.$atts['id'].'"' : '';
 		$h1 .= ! empty( $atts['class'] ) ? ' class="'.$atts['class'].'"' : '';
-		$h1 .= '>'.$this->get_meta( 'h1', $post->ID ).'</h1>';
+		$h1 .= '>';
+		$h1 .= ! empty( $h1_text ) ? $h1_text : get_the_title( $post_id );
+		$h1 .= '</h1>';
 
 		return $h1;
 	}
 	
 	public function output_post_meta_data()
 	{
-		if ( ! $id = $this->get_current_view_id() )
+		if ( ! $id = nyxitSeoHelper::get_cur_view_id() )
 		{
 			return;
 		}
@@ -230,22 +219,26 @@ class nyxitMetaData
 <?php if ( isset( $this->settings['activate_og'] ) ): ?>
 <!-- Open Graph -->
 <meta property="og:title" content="<?= $fb_title; ?>" />
-<meta property="og:type" content="<?php echo is_front_page() ? "website" : "article"; ?>" />
+<meta property="og:type" content="<?= is_front_page() ? "website" : "article" ?>" />
 <meta property="og:url" content="<?php the_permalink( $id ); ?>" />
+<?php if ( $img ): ?>
 <meta property="og:image" content="<?= $img[0]; ?>" />
-<meta property="og:image:width" content="<?= $img[1]; ?>" />
-<meta property="og:image:height" content="<?= $img[2]; ?>" />
-<meta property="og:description" content="<?= $fb_desc; ?>" />
+<meta property="og:image:width" content="<?= $img[1] ?>" />
+<meta property="og:image:height" content="<?= $img[2] ?>" />
+<?php endif ?>
+<meta property="og:description" content="<?= $fb_desc ?>" />
 <meta property="og:site_name" content="<?php bloginfo('name'); ?>" />
-<meta property="og:locale" content="<?php echo get_locale(); ?>" />
+<meta property="og:locale" content="<?= get_locale() ?>" />
 <?php endif; ?>
 <?php if ( isset( $this->settings['activate_tc'] ) ): ?>
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@<?= $this->settings['twitter_name']; ?>">
-<meta name="twitter:title" content="<?= $tw_title; ?>">
-<meta name="twitter:description" content="<?= $tw_desc; ?>">
-<meta name="twitter:image" content="<?= $img[0]; ?>">
+<meta name="twitter:title" content="<?= $tw_title ?>">
+<meta name="twitter:description" content="<?= $tw_desc ?>">
+<?php if ( $img ): ?>
+<meta name="twitter:image" content="<?= $img[0] ?>">
+<?php endif ?>
 <?php endif;
 echo $this->get_meta( 'noindex', $id ) == "1" ? '<meta name="robots" content="noindex, follow">' : '';
 	}

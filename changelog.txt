@@ -1,0 +1,11 @@
+v1.0.1
+2021-04-29  Nikolay Nikolaev  <nikolay.nikolaev25@gmail.com>
+
+* changed names of classes because of duplication with Nyxit starter WP theme
+* inc/common.php: added static class with common assisting functionality
+* changelog.txt: added this file to keep track of changes
+* minor bug fixes
+* removed breadcrumbs shortcode functionality
+* refactoring breadcrumbs class
+* add breadcrumbs structured data
+* added tests

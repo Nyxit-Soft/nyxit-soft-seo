@@ -2,13 +2,11 @@
 
 defined( 'ABSPATH' ) ?: exit;
 
-class nyxitSettings
+class nyxitSeoSettings
 {
     protected $default_options = [
         // uncomment to enable by default
         'activate_meta_data' => "1",
-        //'activate_sitemap' => "1",
-        //'activate_breadcrumbs' => "1",
         //'activate_structured_data' => "1",
         'activate_og' => "1",
         'activate_tc' => "1",
@@ -46,8 +44,8 @@ class nyxitSettings
     public function admin_menu()
 	{
 		add_options_page(
-			'Sematigo SEO Settings',
-			'Sematigo SEO Settings',
+			'Nyxit SEO Settings',
+			'Nyxit SEO Settings',
 			'administrator',
 			'nyxit-seo-settings',
 			array( $this, 'settings_page' )
@@ -56,9 +54,8 @@ class nyxitSettings
 
 	public function settings_page()
 	{
-        var_dump($this->options);
 		?>
-        <h1 style="margin-bottom: 50px;">Sematigo SEO Settings</h1>
+        <h1 style="margin-bottom: 50px;">Nyxit SEO Settings</h1>
 		<form action='options.php' method='post'>
 			<?php
 			settings_fields( 'nyxit_seo_settings' );
@@ -89,28 +86,6 @@ class nyxitSettings
             function () {
                 $checked = checked( isset( $this->options['activate_meta_data'] ), "1", false );
                 echo '<input type="checkbox" name="nyxit_seo_options[activate_meta_data]" value="1" '.$checked.'>';
-            },
-			'nyxit_seo_settings',
-			'nyxit_seo_general'
-        );
-        
-        add_settings_field(
-			'activate_sitemap',
-			'Activate Sitemap',
-            function () {
-                $checked = checked( isset( $this->options['activate_sitemap'] ), "1", false );
-                echo '<input type="checkbox" name="nyxit_seo_options[activate_sitemap]" value="1" '.$checked.'>';
-            },
-			'nyxit_seo_settings',
-			'nyxit_seo_general'
-        );
-        
-        add_settings_field(
-			'activate_breadcrumbs',
-			'Activate Breadcrumbs',
-            function () {
-                $checked = checked( isset( $this->options['activate_breadcrumbs'] ), "1", false );
-                echo '<input type="checkbox" name="nyxit_seo_options[activate_breadcrumbs]" value="1" '.$checked.'>';
             },
 			'nyxit_seo_settings',
 			'nyxit_seo_general'
@@ -152,30 +127,10 @@ class nyxitSettings
 			'twitter_name',
 			'Set Twitter Username for Twitter Card',
             function () {
-                echo '<input type="text" name="nyxit_seo_options[twitter_name]" value="'.$this->options['twitter_name'].'">';
+                echo '<input type="text" name="nyxit_seo_options[twitter_name]" value="'.$this->options['twitter_name'].'"><p>You can find it in your profile URL: https://twitter.com/<b>username</b></p>';
             },
 			'nyxit_seo_settings',
 			'nyxit_seo_metadata'
         );
-
-		/** Sitemap Section */
-		add_settings_section(
-			'nyxit_seo_sitemap',
-			'Sitemap Settings',
-            function () {
-                // no description
-            },
-			'nyxit_seo_settings'
-		);
-        
-        /** Breadcrumbs Section */
-		add_settings_section(
-			'nyxit_seo_breadcrumbs',
-			'Breadcrumbs Settings',
-            function () {
-                // no description
-            },
-			'nyxit_seo_settings'
-		);
     }
 }
