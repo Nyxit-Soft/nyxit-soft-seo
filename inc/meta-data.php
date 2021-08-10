@@ -4,10 +4,6 @@ defined( 'ABSPATH' ) ?: exit;
 
 /**
  * Meta data handler
- * 
- * @package Nyxit SEO
- * 
- * @since 1.0.1
  */
 
 class nyxitSeoMetaData

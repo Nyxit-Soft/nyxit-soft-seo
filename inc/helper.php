@@ -2,6 +2,10 @@
 
 defined( 'ABSPATH' ) ?: exit;
 
+/**
+ * Helper functions class used staticly
+ */
+
 if ( ! class_exists( 'nyxitSeoHelper' ) ):
 
 class nyxitSeoHelper

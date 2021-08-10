@@ -65,11 +65,13 @@ class nyxitSEO
     {
         require 'inc/helper.php';
 
-        if ( isset( $this->settings['activate_meta_data'] ) &&
-            ! class_exists( 'nyxitSeoMetaData' ) )
+        if ( isset( $this->settings['activate_meta_data'] ) )
         {
-            require 'inc/meta-data.php';
-            new nyxitSeoMetaData( $this->settings );
+            if ( ! class_exists( 'nyxitSeoMetaData' ) )
+            {
+                require 'inc/meta-data.php';
+                new nyxitSeoMetaData( $this->settings );
+            }
         }
 
         if ( WP_DEBUG )

@@ -2,6 +2,10 @@
 
 defined( 'ABSPATH' ) ?: exit;
 
+/**
+ * Settings handler
+ */
+
 class nyxitSeoSettings
 {
     protected $default_options = [
