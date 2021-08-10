@@ -1,4 +1,4 @@
-# Nyxit SEO WordPress Plugin
+# Nyxit SEO WordPress Plugin v1.0.1
 
 ## Features:
 

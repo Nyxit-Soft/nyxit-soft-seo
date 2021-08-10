@@ -2,10 +2,23 @@
 
 defined( 'ABSPATH' ) ?: exit;
 
+/**
+ * Meta data handler
+ * 
+ * @package Nyxit SEO
+ * 
+ * @since 1.0.1
+ */
+
 class nyxitSeoMetaData
 {
 	protected $settings;
 
+	/**
+	 * Adding actions and shortcodes
+	 * 
+	 * @param array $settings
+	 */
     public function __construct( $settings )
     {
 		$this->settings = $settings;
@@ -16,11 +29,17 @@ class nyxitSeoMetaData
 		add_shortcode( 'nyxit_h1', [ $this, 'h1_shortcode' ] );
     }
 
+	/**
+	 * Register SEO metabox on posts, pages, and products
+	 */
     public function register_post_meta_box()
 	{
 		add_meta_box( 'nyxit-seo-metabox', 'SEO', [ $this, 'post_metabox_callback' ], [ 'post', 'page', 'product' ], 'normal' );
     }
 
+	/**
+	 * Callback for register_post_meta_box()
+	 */
     public function post_metabox_callback()
 	{
 		global $post;
@@ -50,7 +69,7 @@ class nyxitSeoMetaData
 				<label>Title - Open Graph (Optional)</label>
 			</th>
 			<td>
-				<input type="text" name="nyxit_fb_title" class="regular-text" value="<?= $this->get_meta( 'fb_title', $post->ID ); ?>"> 
+				<input type="text" name="nyxit_og_title" class="regular-text" value="<?= $this->get_meta( 'og_title', $post->ID ); ?>"> 
 			</td>
 		</tr>
 		<tr>
@@ -58,7 +77,7 @@ class nyxitSeoMetaData
 				<label>Description - Open Graph (Optional)</label>
 			</th>
 			<td>
-				<input type="text" name="nyxit_fb_desc" class="regular-text" value="<?= $this->get_meta( 'fb_desc', $post->ID ); ?>"> 
+				<input type="text" name="nyxit_og_desc" class="regular-text" value="<?= $this->get_meta( 'og_desc', $post->ID ); ?>"> 
 			</td>
 		</tr>
 		<?php endif; ?>
@@ -91,8 +110,14 @@ class nyxitSeoMetaData
 		</table>
 		<?php
 	}
-    
-    protected function add_post_meta_to_db( $post_id, $seo_meta )
+
+	/**
+	 * Save SEO meta to database
+	 * 
+	 * @param int $post_id
+	 * @param array $seo_meta
+	 * */    
+    protected function add_post_meta_to_db( int $post_id, array $seo_meta )
 	{
 		foreach ( $seo_meta as $key => $value ) {
 
@@ -110,13 +135,22 @@ class nyxitSeoMetaData
 		}
 	}
 	
-	protected function get_meta( $meta_name, $post_id )
+	/**
+	 * Get SEO meta from database
+	 * 
+	 * @param string $meta_name
+	 * @param int $post_id
+	 */
+	protected function get_meta( string $meta_name, int $post_id )
 	{
 		$meta = get_post_meta( $post_id, '_nyxit_'.$meta_name , true );
 		
 		return empty( $meta ) ? null : $meta;
 	}
     
+	/**
+	 * Sanitize SEO meta from user input
+	 */
     public function save_post_meta( $post_id )
 	{
 		if ( ! isset( $_POST['nyxit_seo_nonce']) ) {
@@ -137,8 +171,8 @@ class nyxitSeoMetaData
 
 		if ( isset( $this->settings['activate_og'] ) )
 		{
-			$seo_meta['_nyxit_fb_title'] = sanitize_text_field( $_POST['nyxit_fb_title'] );
-			$seo_meta['_nyxit_fb_desc'] = sanitize_text_field( $_POST['nyxit_fb_desc'] );
+			$seo_meta['_nyxit_og_title'] = sanitize_text_field( $_POST['nyxit_og_title'] );
+			$seo_meta['_nyxit_og_desc'] = sanitize_text_field( $_POST['nyxit_og_desc'] );
 		}
 
 		if ( isset( $this->settings['activate_tc'] ) )
@@ -150,38 +184,9 @@ class nyxitSeoMetaData
 		$this->add_post_meta_to_db( $post_id, $seo_meta );
 	}
 
-	public function get_post_image( $post_id )
-	{
-		$image_id = 0;
-		
-		// check for post thumbnail
-		if ( has_post_thumbnail( $post_id ) )
-		{
-			$image_id = get_post_thumbnail_id( $post_id );
-		}
-		else
-		{
-			// check for image attachment
-			$attachments = get_children( [
-				'post_parent'    => $post_id,
-				'post_type'      => 'attachment',
-				'numberposts'    => 1,
-				'post_status'    => 'inherit',
-				'post_mime_type' => 'image',
-				'order'          => 'ASC',
-				'orderby'        => 'menu_order ASC'
-			], ARRAY_A );
-
-			foreach ( $attachments as $image )
-			{
-				$image_id = $image['ID'];
-			}
-		}
-		
-		$image = wp_get_attachment_image_src( $image_id, 'large' );
-		return $image;
-	}
-
+	/**
+	 * Add H1 shortcode [nyxit_h1 id="" class=""]
+	 */
 	public function h1_shortcode( $atts )
 	{
 		$atts = shortcode_atts( [
@@ -201,6 +206,9 @@ class nyxitSeoMetaData
 		return $h1;
 	}
 	
+	/**
+	 * Add SEO meta to the front-end
+	 */
 	public function output_post_meta_data()
 	{
 		if ( ! $id = nyxitSeoHelper::get_cur_view_id() )
@@ -209,16 +217,16 @@ class nyxitSeoMetaData
 		}
 
 		$desc = $this->get_meta( 'meta_desc', $id );
-		$fb_title = $this->get_meta( 'fb_title', $id ) ?? get_the_title( $id );
-		$fb_desc = $this->get_meta( 'fb_desc', $id ) ?? $desc;
+		$og_title = $this->get_meta( 'og_title', $id ) ?? get_the_title( $id );
+		$og_desc = $this->get_meta( 'og_desc', $id ) ?? $desc;
 		$tw_title = $this->get_meta( 'tw_title', $id ) ?? get_the_title( $id );
 		$tw_desc = $this->get_meta( 'tw_desc', $id ) ?? $desc;
-		$img = $this->get_post_image( $id );
+		$img = nyxitSeoHelper::get_post_image( $id );
 		?>
 <meta name="description" content="<?= $desc; ?>" />
 <?php if ( isset( $this->settings['activate_og'] ) ): ?>
 <!-- Open Graph -->
-<meta property="og:title" content="<?= $fb_title; ?>" />
+<meta property="og:title" content="<?= $og_title; ?>" />
 <meta property="og:type" content="<?= is_front_page() ? "website" : "article" ?>" />
 <meta property="og:url" content="<?php the_permalink( $id ); ?>" />
 <?php if ( $img ): ?>
@@ -226,7 +234,7 @@ class nyxitSeoMetaData
 <meta property="og:image:width" content="<?= $img[1] ?>" />
 <meta property="og:image:height" content="<?= $img[2] ?>" />
 <?php endif ?>
-<meta property="og:description" content="<?= $fb_desc ?>" />
+<meta property="og:description" content="<?= $og_desc ?>" />
 <meta property="og:site_name" content="<?php bloginfo('name'); ?>" />
 <meta property="og:locale" content="<?= get_locale() ?>" />
 <?php endif; ?>

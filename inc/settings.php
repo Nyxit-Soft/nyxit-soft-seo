@@ -15,6 +15,9 @@ class nyxitSeoSettings
 
     protected $options = false;
 
+    /**
+     * Add default plugin settings to database
+     */
     public function add_default_settings_to_db()
     {
         if ( ! add_option( 'nyxit_seo_options', $this->default_options ) )
@@ -23,24 +26,36 @@ class nyxitSeoSettings
         }
     }
 
+    /**
+     * Get the default plugin settings
+     */
     public function get_default_settings()
     {
         return $this->default_options;
     }
 
-    public function get_settings_from_db()
+    /**
+     * Get settings from the database
+     */
+    public function get_settings_from_db() : array
     {
-        $this->options = get_option( 'nyxit_seo_options', false );
+        $this->options = get_option( 'nyxit_seo_options', array() );
 
         return $this->options;
     }
 
+    /**
+     * Add settings administration UI and setup
+     */
     public function init_ui()
     {
         add_action( 'admin_menu', array( $this, 'admin_menu' ) );
         add_action( 'admin_init',  array( $this, 'init_settings') );
     }
 
+    /**
+     * 
+     */
     public function admin_menu()
 	{
 		add_options_page(
@@ -52,6 +67,9 @@ class nyxitSeoSettings
 		);
 	}
 
+    /**
+     * Settings page callback
+     */
 	public function settings_page()
 	{
 		?>
@@ -66,11 +84,16 @@ class nyxitSeoSettings
 		<?php
     }
     
+    /**
+     * Initialize sections and individual setting fields
+     */
     public function init_settings()
 	{
         register_setting( 'nyxit_seo_settings', 'nyxit_seo_options');
         
-        /** General */
+        /**
+         * General
+         **/
         add_settings_section(
 			'nyxit_seo_general',
 			'General Settings',
@@ -91,7 +114,9 @@ class nyxitSeoSettings
 			'nyxit_seo_general'
         );
         
-		/** Meta Data */
+		/** 
+         * Meta Data Settings
+         **/
 		add_settings_section(
 			'nyxit_seo_metadata',
 			'Meta Data Settings',
@@ -132,5 +157,9 @@ class nyxitSeoSettings
 			'nyxit_seo_settings',
 			'nyxit_seo_metadata'
         );
+
+        /** 
+         * Stuctured Data Settings
+         **/
     }
 }
